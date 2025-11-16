@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # API Configuration
-API_BASE_URL = "https://backend.composio.dev/api/v1/rube"
+API_BASE_URL = "https://backend.composio.dev/api/v3/rube"
 
 def log(message):
     """Print timestamped log message"""
