@@ -33,7 +33,7 @@ def run_recipe():
     print(f"Input data: {json.dumps(input_data, indent=2)}")
 
     # Call Composio API to execute recipe
-    url = f"https://backend.composio.dev/api/v1/recipes/{recipe_id}/execute"
+    url = f"https://backend.composio.dev/api/v3/recipes/{recipe_id}/execute"
 
     headers = {
         "X-API-Key": api_key,
