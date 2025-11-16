@@ -1,11 +1,12 @@
 # GitHub Actions Workflow for Market America Prospect Analysis
 # File: .github/workflows/market-america-analysis.yml
+# Updated to use Composio v3 API / Rube execution endpoint
 
 name: 美安名單追蹤分析自動化
 
 on:
   schedule:
-    # 每天早上 8:00 (UTC 00:00) 執行
+    # 每天早上 8:00 (UTC 00:00，台灣時間 08:00) 執行
     - cron: '0 0 * * *'
     # 每週一早上 8:00 執行
     # - cron: '0 0 * * 1'
@@ -25,6 +26,7 @@ on:
 jobs:
   run-analysis:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
@@ -57,7 +59,9 @@ jobs:
         with:
           name: execution-log-${{ github.run_number }}
           path: execution_log.json
-          if-no-files-found: ignore
           retention-days: 30
 
-
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::Market America analysis failed. Check logs for details."
