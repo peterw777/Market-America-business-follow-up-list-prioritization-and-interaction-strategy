@@ -59,6 +59,7 @@ jobs:
         with:
           name: execution-log-${{ github.run_number }}
           path: execution_log.json
+          if-no-files-found: ignore
           retention-days: 30
 
       - name: Notify on failure
