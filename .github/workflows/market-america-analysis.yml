@@ -1,0 +1,62 @@
+# GitHub Actions Workflow for Market America Prospect Analysis
+# File: .github/workflows/market-america-analysis.yml
+
+name: 美安名單追蹤分析自動化
+
+on:
+  schedule:
+    # 每天早上 8:00 (UTC 00:00) 執行
+    - cron: '0 0 * * *'
+    # 每週一早上 8:00 執行
+    # - cron: '0 0 * * 1'
+
+  # 允許手動觸發
+  workflow_dispatch:
+    inputs:
+      days_ahead:
+        description: '分析未來幾天的活動'
+        required: false
+        default: '21'
+      top_n_prospects:
+        description: '生成前 N 名推薦名單'
+        required: false
+        default: '10'
+
+jobs:
+  run-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Run Market America Prospect Analysis
+        env:
+          COMPOSIO_API_KEY: ${{ secrets.COMPOSIO_API_KEY }}
+          RECIPE_ID: rcp_tSRsPrHZ4EUY
+          PROSPECT_SPREADSHEET_ID: ${{ secrets.PROSPECT_SPREADSHEET_ID }}
+          LINE_LOG_SPREADSHEET_ID: ${{ secrets.LINE_LOG_SPREADSHEET_ID }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+          DAYS_AHEAD: ${{ github.event.inputs.days_ahead || '21' }}
+          TOP_N_PROSPECTS: ${{ github.event.inputs.top_n_prospects || '10' }}
+        run: |
+          python .github/scripts/run_recipe.py
+
+      - name: Upload execution log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: execution-log-${{ github.run_number }}
+          path: execution_log.json
+          retention-days: 30
+
+
